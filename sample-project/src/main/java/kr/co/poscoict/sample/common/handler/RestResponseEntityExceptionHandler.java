@@ -1,5 +1,6 @@
 package kr.co.poscoict.sample.common.handler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,19 +31,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 	private MessageSourceUtil messageSource;
 	
 	/**
-	 * 204 처리 (NO CONTENT)
-	 * @param e
-	 * @param request
-	 * @return
-	 */
-	@ExceptionHandler(value = {ResourceNotFoundException.class})
-	protected ResponseEntity<Object> handleNoContent(RuntimeException e, WebRequest request) {
-		logger.error(e.getMessage(), e);
-		return super.handleExceptionInternal(e, new ErrorResponse(messageSource.getMessage("api.error.notFound")),
-				new HttpHeaders(), HttpStatus.NO_CONTENT, request);
-	}
-	
-	/**
 	 * 400 처리 (BAD_REQUEST)
 	 * @param e
 	 * @param request
@@ -56,6 +44,20 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 				new ErrorResponse(e.getBindingResult().getFieldError().getField(), e.getBindingResult().getFieldError().getDefaultMessage()),
 				new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
+	
+	/**
+	 * 404 처리 (NOT_FOUND)
+	 * @param e
+	 * @param request
+	 * @return
+	 */
+	@ExceptionHandler(value = {ResourceNotFoundException.class})
+	protected ResponseEntity<Object> handleNotFound(ResourceNotFoundException e, WebRequest request) {
+		logger.error(e.getMessage(), e);
+		return super.handleExceptionInternal(e,
+				new ErrorResponse(StringUtils.isNotEmpty(e.getMessage()) ? e.getMessage() : messageSource.getMessage("api.error.notFound")),
+				new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+	}
 
 	/**
 	 * 409 처리 (CONFLICT)
@@ -64,9 +66,10 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 	 * @return
 	 */
 	@ExceptionHandler(value = {ResourceConflictException.class})
-	protected ResponseEntity<Object> handleConflict(RuntimeException e, WebRequest request) {
+	protected ResponseEntity<Object> handleConflict(ResourceConflictException e, WebRequest request) {
 		logger.error(e.getMessage(), e);
-		return super.handleExceptionInternal(e, new ErrorResponse(messageSource.getMessage("api.error.conflict")),
+		return super.handleExceptionInternal(e,
+				new ErrorResponse(StringUtils.isNotEmpty(e.getMessage()) ? e.getMessage() : messageSource.getMessage("api.error.conflict")),
 				new HttpHeaders(), HttpStatus.CONFLICT, request);
 	}
 	
@@ -77,7 +80,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 	 * @return
 	 */
 	@ExceptionHandler(value = {Exception.class})
-	protected ResponseEntity<Object> handleInternalServerError(RuntimeException e, WebRequest request) {
+	protected ResponseEntity<Object> handleInternalServerError(Exception e, WebRequest request) {
 		logger.error(e.getMessage(), e);
 		return super.handleExceptionInternal(e, new ErrorResponse(messageSource.getMessage("api.error.serverError")),
 				new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);

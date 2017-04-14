@@ -39,4 +39,12 @@ public class UserService {
 	public void updateUser(User user) {
 		this.userMapper.updateUser(user);
 	}
+	
+	public void deleteUsers() {
+		this.userMapper.deleteUser(null);
+	}
+	
+	public void deleteUser(String id) {
+		this.userMapper.deleteUser(id);
+	}
 }
