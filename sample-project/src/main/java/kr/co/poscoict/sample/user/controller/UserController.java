@@ -10,10 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -44,7 +48,8 @@ public class UserController {
 	 * 현재 시간 테스트
 	 * @return
 	 */
-	@RequestMapping(value = "/now", method = RequestMethod.GET)
+	@GetMapping(path = "/now")
+	@ResponseStatus(HttpStatus.OK)
 	public String getCurrentTime() {
 		return this.userService.getCurrentTime();
 	}
@@ -53,14 +58,16 @@ public class UserController {
 	 * 사용자 전체 조회
 	 * @return
 	 */
-	@RequestMapping(value = "/user", method = RequestMethod.GET)
-	public ResponseEntity<List<User>> getUsers() {
+	@GetMapping(path = "/user")
+	@ResponseStatus(HttpStatus.OK)
+	public List<User> getUsers() {
 		logger.info("사용자 전체 조회");
+		
 		List<User> userList = this.userService.findUsers();
 		if(userList.isEmpty()) {
 			throw new ResourceNotFoundException(this.messageSource.getMessage("user.noExists.all"));
 		}
-		return new ResponseEntity<List<User>>(userList, HttpStatus.OK);
+		return userList;
 	}
 	
 	/**
@@ -68,15 +75,16 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
-	public ResponseEntity<User> getUser(@PathVariable(value = "id") String id) {
+	@GetMapping(path = "/user/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public User getUser(@PathVariable(value = "id") String id) {
 		logger.info("ID로 사용자 조회: {}", id);
 		
 		User user = this.userService.findUserById(id);
 		if(user == null) {
 			throw new ResourceNotFoundException(this.messageSource.getMessage("user.noExists.id", id));
 		}
-		return new ResponseEntity<User>(user, HttpStatus.OK);
+		return user;
 	}
 	
 	/**
@@ -85,7 +93,7 @@ public class UserController {
 	 * @return
 	 * @throws MethodArgumentNotValidException 
 	 */
-	@RequestMapping(value = "/user", method = RequestMethod.POST)
+	@PostMapping(path = "/user")
 	public ResponseEntity<Void> createUser(@RequestBody @Validated(Create.class) User user, UriComponentsBuilder uriBuilder) {
 		logger.info("사용자 등록: {}", user);
 		
@@ -94,7 +102,7 @@ public class UserController {
 			throw new ResourceConflictException(this.messageSource.getMessage("user.conflict", currentUser.getName()));
 		}
 		this.userService.saveUser(user);
-		// 등록된 사용자 ID를 HTTP Header에 전송
+		// 등록된 사용자 ID를 HTTP Header의 Location 필드에 전송
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(uriBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
@@ -105,7 +113,8 @@ public class UserController {
 	 * @return
 	 */
 	@RequestMapping(value = "/user/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
-	public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody @Validated(Update.class) User user) {
+	@ResponseStatus(HttpStatus.OK)
+	public User updateUser(@PathVariable String id, @RequestBody @Validated(Update.class) User user) {
 		logger.info("사용자 수정. ID: {}", id);
 		
 		User currentUser = this.userService.findUserById(id);
@@ -115,19 +124,19 @@ public class UserController {
 		currentUser.setName(user.getName());
 		currentUser.setTelNum(user.getTelNum());
 		this.userService.updateUser(currentUser);
-		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+		return currentUser;
 	}
 	
 	/**
 	 * 사용자 전체 삭제
 	 * @return
 	 */
-	@RequestMapping(value = "/user", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteUsers() {
+	@DeleteMapping(path = "/user")
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteUsers() {
 		logger.info("사용자 전체 삭제");
 		
 		this.userService.deleteUsers();
-		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	
 	/**
@@ -135,8 +144,9 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+	@DeleteMapping(path = "/user/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteUser(@PathVariable String id) {
 		logger.info("사용자  삭제. id : {}", id);
 		
 		User currentUser = this.userService.findUserById(id);
@@ -144,6 +154,5 @@ public class UserController {
 			throw new ResourceNotFoundException(this.messageSource.getMessage("user.noExists.id", id));
 		}
 		this.userService.deleteUser(id);
-		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 }
