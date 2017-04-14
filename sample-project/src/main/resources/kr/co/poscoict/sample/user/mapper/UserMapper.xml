@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.poscoict.sample.user.mapper.UserMapper">
+	<select id="selectNow" resultType="string">
+		SELECT NOW()
+	</select>
+	<insert id="insertUser" parameterType="kr.co.poscoict.sample.user.model.User">
+		INSERT INTO USER(
+			  ID
+			, NAME
+			, TEL_NUM
+		) VALUES (
+			  #{id}
+			, #{name}
+			, #{telNum}
+		)
+	</insert>
+	<select id="selectUser" parameterType="String" resultType="kr.co.poscoict.sample.user.model.User">
+		SELECT
+			ID
+			, NAME
+			, TEL_NUM
+		FROM USER
+		<if test="_parameter != null">
+		WHERE ID = #{_parameter}
+		</if>
+	</select>
+	<update id="updateUser" parameterType="kr.co.poscoict.sample.user.model.User">
+		UPDATE USER
+		SET
+			NAME = #{name},
+			TEL_NUM = #{telNum}
+		WHERE
+			ID = #{id}
+	</update>
+	<delete id="deleteUser" parameterType="String">
+		DELETE FROM USER
+		<if test="_parameter != null">
+		WHERE ID = #{_parameter}
+		</if>
+	</delete>
+</mapper>
