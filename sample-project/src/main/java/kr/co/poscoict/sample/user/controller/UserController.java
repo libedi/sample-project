@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,8 +89,8 @@ public class UserController {
 	/**
 	 * 사용자 등록
 	 * @param user
+	 * @param uriBuilder
 	 * @return
-	 * @throws MethodArgumentNotValidException 
 	 */
 	@PostMapping(path = "/user")
 	public ResponseEntity<Void> createUser(@RequestBody @Validated(Create.class) User user, UriComponentsBuilder uriBuilder) {
@@ -110,6 +109,8 @@ public class UserController {
 	
 	/**
 	 * 사용자 수정
+	 * @param id
+	 * @param user
 	 * @return
 	 */
 	@RequestMapping(value = "/user/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
@@ -129,7 +130,6 @@ public class UserController {
 	
 	/**
 	 * 사용자 전체 삭제
-	 * @return
 	 */
 	@DeleteMapping(path = "/user")
 	@ResponseStatus(HttpStatus.OK)
@@ -142,7 +142,6 @@ public class UserController {
 	/**
 	 * 사용자 삭제
 	 * @param id
-	 * @return
 	 */
 	@DeleteMapping(path = "/user/{id}")
 	@ResponseStatus(HttpStatus.OK)
