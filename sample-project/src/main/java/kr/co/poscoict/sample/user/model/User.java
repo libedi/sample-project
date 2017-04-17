@@ -10,7 +10,7 @@ import kr.co.poscoict.sample.framework.model.ValidMarker;
  *
  */
 public class User extends ValidMarker {
-	@NotEmpty(groups = {Create.class, Retrieve.class, Update.class, Delete.class})
+	@NotEmpty(groups = {Create.class, Retrieve.class, Delete.class})
 	private String id;
 	@NotEmpty(groups = {Create.class})
 	private String name;

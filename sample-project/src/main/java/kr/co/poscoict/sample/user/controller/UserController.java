@@ -55,9 +55,10 @@ public class UserController {
 	
 	/**
 	 * 사용자 전체 조회
+	 * - 페이징 처리시 offset, limit 값을 파라미터로 받아 처리
 	 * @return
 	 */
-	@GetMapping(path = "/user")
+	@GetMapping(path = "/users")
 	@ResponseStatus(HttpStatus.OK)
 	public List<User> getUsers() {
 		logger.info("사용자 전체 조회");
@@ -74,7 +75,7 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping(path = "/user/{id}")
+	@GetMapping(path = "/users/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public User getUser(@PathVariable(value = "id") String id) {
 		logger.info("ID로 사용자 조회: {}", id);
@@ -92,7 +93,7 @@ public class UserController {
 	 * @param uriBuilder
 	 * @return
 	 */
-	@PostMapping(path = "/user")
+	@PostMapping(path = "/users")
 	public ResponseEntity<Void> createUser(@RequestBody @Validated(Create.class) User user, UriComponentsBuilder uriBuilder) {
 		logger.info("사용자 등록: {}", user);
 		
@@ -103,7 +104,7 @@ public class UserController {
 		this.userService.saveUser(user);
 		// 등록된 사용자 ID를 HTTP Header의 Location 필드에 전송
 		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(uriBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
+		headers.setLocation(uriBuilder.path("/users/{id}").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
 	}
 	
@@ -113,7 +114,7 @@ public class UserController {
 	 * @param user
 	 * @return
 	 */
-	@RequestMapping(value = "/user/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
+	@RequestMapping(value = "/users/{id}", method = {RequestMethod.PUT, RequestMethod.PATCH})
 	@ResponseStatus(HttpStatus.OK)
 	public User updateUser(@PathVariable String id, @RequestBody @Validated(Update.class) User user) {
 		logger.info("사용자 수정. ID: {}", id);
@@ -131,7 +132,7 @@ public class UserController {
 	/**
 	 * 사용자 전체 삭제
 	 */
-	@DeleteMapping(path = "/user")
+	@DeleteMapping(path = "/users")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUsers() {
 		logger.info("사용자 전체 삭제");
@@ -143,7 +144,7 @@ public class UserController {
 	 * 사용자 삭제
 	 * @param id
 	 */
-	@DeleteMapping(path = "/user/{id}")
+	@DeleteMapping(path = "/users/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public void deleteUser(@PathVariable String id) {
 		logger.info("사용자  삭제. id : {}", id);

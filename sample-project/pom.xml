@@ -82,6 +82,11 @@
 		    <artifactId>commons-lang3</artifactId>
 		    <version>3.5</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.3</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -92,6 +97,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
 </project>
