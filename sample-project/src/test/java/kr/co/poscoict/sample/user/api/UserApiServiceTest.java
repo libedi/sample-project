@@ -110,6 +110,7 @@ public class UserApiServiceTest {
 		User user = new User();
 		user.setName("테스트2");
 		user.setTelNum("01012345670");
+		// RestTemplate 에서는 기본적으로 PATCH 메서드를 지원하지 않는다. 따라서 exchange() 메서드를 사용.
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 		ResponseEntity<User> response = this.restTemplate.exchange(REST_SERVICE_URL + "/users/A1234", HttpMethod.PATCH, new HttpEntity<User>(user, headers), User.class);
